@@ -41,13 +41,13 @@ bool consume(char op) {
 
 void expect(char op) {
   if (token->kind != TK_RESERVED || token->str[0] != op)
-    error("'%c'ではありません", op);
+    error("'%c' is expected, but it is not'%c'", op);
   token = token->next;
 }
 
 int expect_number() {
   if (token->kind != TK_NUM)
-    error("数ではありません");
+    error("Int is expected, but it is not Int value");
   int val = token->val;
   token = token->next;
   return val;
