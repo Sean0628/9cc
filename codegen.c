@@ -1,8 +1,42 @@
 #include "9cc.h"
 
+void gen_addr(Node *node) {
+  if (node->kind == ND_VAR) {
+    int offset = (node->name - 'a' + 1) * 8;
+    printf("  lea rax, [rbp-%d]\n", offset);
+    printf("  push rax\n");
+    return;
+  }
+
+  error("Not an lvalue");
+}
+
+void load(void) {
+  printf("  pop rax\n");
+  printf("  mov rax, [rax]\n");
+  printf("  push rax\n");
+}
+
+void store(void) {
+  printf("  pop rdi\n");
+  printf("  pop rax\n");
+  printf("  mov [rax], rdi\n");
+  printf("  push rdi\n");
+}
+
 void gen(Node *node) {
-  if (node->kind == ND_NUM) {
+  switch (node->kind) {
+  case ND_NUM:
     printf("  push %d\n", node->val);
+    return;
+  case ND_VAR:
+    gen_addr(node);
+    load();
+    return;
+  case ND_ASSIGN:
+    gen_addr(node->lhs);
+    gen(node->rhs);
+    store();
     return;
   }
 
@@ -66,10 +100,19 @@ void codegen(Node *node) {
   printf(".global main\n");
   printf("main:\n");
 
+  // Prologue
+  printf("  push rbp\n");
+  printf("  mov rbp, rsp\n");
+  printf("  sub rsp, 208\n");
+
   for (Node *n = node; n; n = n->next) {
     gen(n);
     printf("  pop rax\n");
   }
 
+  // Epilogue
+  printf(".L.return:\n");
+  printf("  mov rsp, rbp\n");
+  printf("  pop rbp\n");
   printf("  ret\n");
 }

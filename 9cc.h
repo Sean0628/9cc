@@ -11,6 +11,7 @@
 
 typedef enum {
   TK_RESERVED,
+  TK_IDENT,
   TK_NUM,
   TK_EOF,
 } TokenKind;
@@ -27,6 +28,7 @@ struct Token {
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 bool consume(char *op);
+Token *consume_ident(void);
 void expect(char *op);
 int expect_number();
 bool at_eof();
@@ -40,17 +42,19 @@ Token *token;
 //
 
 typedef enum {
-  ND_ADD, // +
-  ND_SUB, // -
-  ND_MUL, // *
-  ND_DIV, // /
-  ND_EQ,  // =
-  ND_NE,  // !=
-  ND_LT,  // <
-  ND_LE,  // <=
-  ND_GT,  // >
-  ND_GE,  // >=
-  ND_NUM, // Integer
+  ND_ADD,    // +
+  ND_SUB,    // -
+  ND_MUL,    // *
+  ND_DIV,    // /
+  ND_EQ,     // ==
+  ND_NE,     // !=
+  ND_LT,     // <
+  ND_LE,     // <=
+  ND_GT,     // >
+  ND_GE,     // >=
+  ND_ASSIGN, // =
+  ND_VAR,    // Variable
+  ND_NUM,    // Integer
 } NodeKind;
 
 // AST node type
@@ -60,6 +64,7 @@ struct Node {
   Node *next;
   Node *lhs;
   Node *rhs;
+  char name;
   int val;
 };
 
