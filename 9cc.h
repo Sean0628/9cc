@@ -5,54 +5,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct Node Node;
-typedef struct Token Token;
-typedef enum {
-  ND_ADD,
-  ND_SUB,
-  ND_MUL,
-  ND_DIV,
-  ND_EQ,
-  ND_NE,
-  ND_LT,
-  ND_LE,
-  ND_GT,
-  ND_GE,
-  ND_NUM,
-} NodeKind;
+//
+// tokenize.c
+//
+
 typedef enum {
   TK_RESERVED,
   TK_NUM,
   TK_EOF,
 } TokenKind;
 
-char *user_input;
-
-void gen(Node *node);
-void error(char *fmt, ...);
-void expect(char *op);
-bool consume(char *op);
-int expect_number();
-
-Token *tokenize();
-Token *token;
-
-Node *new_node(NodeKind kind);
-Node *expr();
-Node *equality();
-Node *relational();
-Node *add();
-Node *mul();
-Node *unary();
-Node *primary();
-
-struct Node {
-  NodeKind kind;
-  Node *lhs;
-  Node *rhs;
-  int val;
-};
-
+typedef struct Token Token;
 struct Token {
   TokenKind kind;
   Token *next;
@@ -60,3 +23,49 @@ struct Token {
   char *str;
   int len;
 };
+
+void error(char *fmt, ...);
+void error_at(char *loc, char *fmt, ...);
+bool consume(char *op);
+void expect(char *op);
+int expect_number();
+bool at_eof();
+Token *tokenize();
+
+char *user_input;
+Token *token;
+
+//
+// parse.c
+//
+
+typedef enum {
+  ND_ADD, // +
+  ND_SUB, // -
+  ND_MUL, // *
+  ND_DIV, // /
+  ND_EQ,  // =
+  ND_NE,  // !=
+  ND_LT,  // <
+  ND_LE,  // <=
+  ND_GT,  // >
+  ND_GE,  // >=
+  ND_NUM, // Integer
+} NodeKind;
+
+// AST node type
+typedef struct Node Node;
+struct Node {
+  NodeKind kind;
+  Node *lhs;
+  Node *rhs;
+  int val;
+};
+
+Node *expr();
+
+//
+// codegen.c
+//
+
+void codegen(Node *node);
