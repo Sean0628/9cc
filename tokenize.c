@@ -65,8 +65,7 @@ bool startswith(char *p, char *q) {
 
 Token *tokenize() {
   char *p = user_input;
-  Token head;
-  head.next = NULL;
+  Token head = {};
   Token *cur = &head;
 
   while (*p) {
@@ -76,14 +75,16 @@ Token *tokenize() {
       continue;
     }
 
-    if (startswith(p, "==") || startswith(p, "!=") ||
-        startswith(p, "<=") || startswith(p, ">=")) {
+    if (startswith(p, "==") ||
+        startswith(p, "!=") ||
+        startswith(p, "<=") ||
+        startswith(p, ">=")) {
       cur = new_token(TK_RESERVED, cur, p, 2);
       p += 2;
       continue;
     }
 
-    if (strchr("+-*/()<>", *p)) {
+    if (ispunct(*p)) {
       cur = new_token(TK_RESERVED, cur, p++, 1);
       continue;
     }
