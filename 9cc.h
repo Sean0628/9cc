@@ -65,6 +65,7 @@ typedef enum {
   ND_ASSIGN,    // =
   ND_VAR,       // Variable
   ND_RETURN,    // "return"
+  ND_IF,        // "if"
   ND_EXPR_STMT, // Expression statement
   ND_NUM,       // Integer
 } NodeKind;
@@ -76,6 +77,12 @@ struct Node {
   Node *next;
   Node *lhs;
   Node *rhs;
+
+  // "if" statement
+  Node *cond;
+  Node *then;
+  Node *els;
+
   Var *var;
   int val;
 };
