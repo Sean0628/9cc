@@ -70,6 +70,8 @@ typedef enum {
   ND_GT,        // >
   ND_GE,        // >=
   ND_ASSIGN,    // =
+  ND_ADDR,      // unary &
+  ND_DEREF,     // unary *
   ND_VAR,       // Variable
   ND_RETURN,    // "return"
   ND_IF,        // "if"
