@@ -29,6 +29,10 @@ void gen(Node *node) {
   case ND_NUM:
     printf("  push %d\n", node->val);
     return;
+  case ND_EXPR_STMT:
+    gen(node->lhs);
+    printf("  add rsp, 8\n");
+    return;
   case ND_VAR:
     gen_addr(node);
     load();
@@ -37,6 +41,11 @@ void gen(Node *node) {
     gen_addr(node->lhs);
     gen(node->rhs);
     store();
+    return;
+  case ND_RETURN:
+    gen(node->lhs);
+    printf("  pop rax\n");
+    printf("  jmp .L.return\n");
     return;
   }
 
@@ -105,10 +114,8 @@ void codegen(Node *node) {
   printf("  mov rbp, rsp\n");
   printf("  sub rsp, 208\n");
 
-  for (Node *n = node; n; n = n->next) {
+  for (Node *n = node; n; n = n->next)
     gen(n);
-    printf("  pop rax\n");
-  }
 
   // Epilogue
   printf(".L.return:\n");
