@@ -43,5 +43,5 @@ assert 0 'return 1>=2;'
 assert 1 'return 1; 2; 3;'
 
 assert 3 'a=3; return a;'
-
+assert 3 'foo=3; return foo;'
 echo OK
