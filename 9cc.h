@@ -94,6 +94,7 @@ struct Node {
 
   // Function call
   char *funcname;
+  Node *args;
 
   Var *var;
   int val;
