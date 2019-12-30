@@ -98,6 +98,15 @@ Node *stmt(void) {
     return node;
   }
 
+  if (consume("while")) {
+    Node *node = new_node(ND_WHILE);
+    expect("(");
+    node->cond = expr();
+    expect(")");
+    node->then = stmt();
+    return node;
+  }
+
   Node *node = read_expr_stmt();
   expect(";");
   return node;

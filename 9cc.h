@@ -66,6 +66,7 @@ typedef enum {
   ND_VAR,       // Variable
   ND_RETURN,    // "return"
   ND_IF,        // "if"
+  ND_WHILE,        // "if"
   ND_EXPR_STMT, // Expression statement
   ND_NUM,       // Integer
 } NodeKind;
@@ -78,7 +79,7 @@ struct Node {
   Node *lhs;
   Node *rhs;
 
-  // "if" statement
+  // "if"/"while" statement
   Node *cond;
   Node *then;
   Node *els;
