@@ -32,9 +32,10 @@ struct Token {
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 void error_tok(Token *tok, char *fmt, ...);
+Token *peek(char *s);
 Token *consume(char *op);
 Token *consume_ident(void);
-void expect(char *op);
+void expect(char *s);
 int expect_number();
 char *expect_ident(void);
 bool at_eof();
@@ -51,6 +52,7 @@ Token *token;
 typedef struct Var Var;
 struct Var {
   char *name;
+  Type *ty;
   int offset;
 };
 
@@ -86,6 +88,7 @@ typedef enum {
   ND_FCALL,     // Function call
   ND_EXPR_STMT, // Expression statement
   ND_NUM,       // Integer
+  ND_NULL,      // null
 } NodeKind;
 
 // AST node type
@@ -139,7 +142,10 @@ struct Type {
   Type *base;
 };
 
+extern Type *int_type;
+
 bool is_integer(Type *ty);
+Type *pointer_to(Type *base);
 void add_type(Node *node);
 
 //
