@@ -49,11 +49,12 @@ Token *token;
 // parse.c
 //
 
-// Local variable
+// Variable
 typedef struct Var Var;
 struct Var {
   char *name;
   Type *ty;
+  bool is_local;
   int offset;
 };
 
@@ -130,7 +131,12 @@ struct Function {
   int stack_size;
 };
 
-Function *program();
+typedef struct {
+  VarList *globals;
+  Function *fns;
+} Program;
+
+Program *program(void);
 
 //
 // type.c
@@ -156,4 +162,4 @@ void add_type(Node *node);
 // codegen.c
 //
 
-void codegen(Function *prog);
+void codegen(Program *prog);

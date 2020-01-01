@@ -9,10 +9,16 @@ static void gen(Node *node);
 
 void gen_addr(Node *node) {
   switch (node->kind) {
-    case ND_VAR:
-      printf("  lea rax, [rbp-%d]\n", node->var->offset);
-      printf("  push rax\n");
-      return;
+    case ND_VAR: {
+                  Var *var = node->var;
+                  if (var->is_local) {
+                    printf("  lea rax, [rbp-%d]\n", var->offset);
+                    printf("  push rax\n");
+                  } else {
+                    printf("  push offset %s\n", var->name);
+                  }
+                  return;
+                 }
     case ND_DEREF:
       gen(node->lhs);
       return;
@@ -40,10 +46,10 @@ void store(void) {
   printf("  push rdi\n");
 }
 
-void gen(Node *node) {
+static void gen(Node *node) {
   switch (node->kind) {
-    case ND_NULL:
-      return;
+  case ND_NULL:
+    return;
   case ND_NUM:
     printf("  push %d\n", node->val);
     return;
@@ -75,7 +81,7 @@ void gen(Node *node) {
                   gen(node->cond);
                   printf("  pop rax\n");
                   printf("  cmp rax, 0\n");
-                  printf("  je .L.else.%d\n", seq);
+                  printf("  je  .L.else.%d\n", seq);
                   gen(node->then);
                   printf("  jmp .L.end.%d\n", seq);
                   printf(".L.else.%d:\n", seq);
@@ -85,7 +91,7 @@ void gen(Node *node) {
                   gen(node->cond);
                   printf("  pop rax\n");
                   printf("  cmp rax, 0\n");
-                  printf("  je .L.end.%d\n", seq);
+                  printf("  je  .L.end.%d\n", seq);
                   gen(node->then);
                   printf(".L.end.%d:\n", seq);
                 }
@@ -97,7 +103,7 @@ void gen(Node *node) {
                    gen(node->cond);
                    printf("  pop rax\n");
                    printf("  cmp rax, 0\n");
-                   printf("  je .L.end.%d\n", seq);
+                   printf("  je  .L.end.%d\n", seq);
                    gen(node->then);
                    printf("  jmp .L.begin.%d\n", seq);
                    printf(".L.end.%d:\n", seq);
@@ -112,7 +118,7 @@ void gen(Node *node) {
                    gen(node->cond);
                    printf("  pop rax\n");
                    printf("  cmp rax, 0\n");
-                   printf("  je .L.end.%d\n", seq);
+                   printf("  je  .L.end.%d\n", seq);
                  }
                  gen(node->then);
                  if (node->inc)
@@ -227,9 +233,18 @@ void gen(Node *node) {
   printf("  push rax\n");
 }
 
-void codegen(Function *prog) {
-  printf(".intel_syntax noprefix\n");
-  for (Function *fn = prog; fn; fn = fn->next) {
+static void emit_data(Program *prog) {
+  printf(".data\n");
+
+  for (VarList *vl = prog->globals; vl; vl = vl->next) {
+    Var *var = vl->var;
+    printf("%s:\n", var->name);
+    printf("  .zero %d\n", var->ty->size);
+  }
+}
+static void emit_text(Program *prog) {
+  printf(".text\n");
+  for (Function *fn = prog->fns; fn; fn = fn->next) {
     printf(".global %s\n", fn->name);
     printf("%s:\n", fn->name);
     funcname = fn->name;
@@ -255,4 +270,10 @@ void codegen(Function *prog) {
     printf("  pop rbp\n");
     printf("  ret\n");
   }
+}
+
+void codegen(Program *prog) {
+  printf(".intel_syntax noprefix\n");
+  emit_data(prog);
+  emit_text(prog);
 }

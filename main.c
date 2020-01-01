@@ -7,9 +7,9 @@ int main(int argc, char **argv) {
   // Tokenize and Parse
   user_input = argv[1];
   token = tokenize();
-  Function *prog = program();
+  Program *prog = program();
 
-  for (Function *fn = prog; fn; fn = fn->next) {
+  for (Function *fn = prog->fns; fn; fn = fn->next) {
     int offset = 0;
     for (VarList *vl = fn->locals; vl; vl = vl->next) {
       Var *var = vl->var;
