@@ -133,6 +133,20 @@ Token *tokenize() {
       continue;
     }
 
+    if (*p == '"') {
+      char *q = p++;
+      while (*p && *p != '"')
+        p++;
+      if (!*p)
+        error_at(q, "Unclosed string literal");
+      p++;
+
+      cur = new_token(TK_STR, cur, q, p - q);
+      cur->contents = strndup(q + 1, p - q - 2);
+      cur->cont_len = p - q - 1;
+      continue;
+    }
+
     char *kw = starts_with_reserved(p);
     if (kw) {
       int len = strlen(kw);
